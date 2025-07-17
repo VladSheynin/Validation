@@ -1,0 +1,36 @@
+[
+  {
+    "name": "INN",
+	"isUnique": "true",
+	"notNull": "true",
+    "regulars": [
+      {
+        "regularValue": "^\\d{9}$",
+        "errorMessage": "Ошибка: в поле не только цифры или их количество не 9"
+		"workingMessge": "Проверяю что в поле только цифры"
+      },
+      {
+        "regularValue": ".*3.*",
+        "errorMessage": "Ошибка: поле должно содержать хотя бы одну тройку "
+		"workingMessge": "Проверяю на то что в поле должна быть хотя бы одна тройка"
+      }
+    ]
+  },
+  {
+	"name": "ACCOUNT",
+	"isUnique": "false",
+	"notNull": "true",
+    "regulars": [
+      {
+        "regularValue": "^\\d{20}$",
+        "errorMessage": "Ошибка: в поле не только цифры или их количество не 20"
+		"workingMessge": "Проверяю что в поле только цифры"
+      },
+      {
+        "regularValue": "^408.*",
+        "errorMessage": "Ошибка: номер счета начинается не с 408 "
+		"workingMessge": "Проверяю на то что значение начинается с 408"
+      }
+    ]
+  }
+]
