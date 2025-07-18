@@ -12,11 +12,12 @@ import static com.vsh.AdapterExcel.getDataFromExcel;
  */
 public class App {
     static List<ConfigObjectForValidation> configsList;
+    static List<ErrorList> errorLists = new ArrayList<>();
 
     public static void main(String[] args) {
         String fileFullPathName = "C:\\Projects\\Validation\\example.xlsx";
-        List<List<String>> allDataFromExcel = new ArrayList<>();
-        configsList = getAllConfigObject();
+        List<List<ObjectForValidation>> allDataFromExcel = new ArrayList<>();
+        configsList = getAllConfigObject(); //получаю все объекты валидации
         try {
             allDataFromExcel = getDataFromExcel(fileFullPathName);
             if (allDataFromExcel == null) {
@@ -27,30 +28,36 @@ public class App {
             System.out.println("Файл " + fileFullPathName + " не найден");
         }
         //обработка testColumn-того столбца
-        List<String> columnIterator = new ArrayList<>();
+        List<ObjectForValidation> columnIterator = new ArrayList<>();
         int testColumn = 0;
         String fieldName = "";
+        ErrorList errorList = new ErrorList();
         for (int j = 0; j < allDataFromExcel.get(0).size(); j++) {
             columnIterator.clear();
-            for (List<String> strings : allDataFromExcel) {
-                columnIterator.add(strings.get(j));
+            for (List<ObjectForValidation> object : allDataFromExcel) {
+                columnIterator.add(object.get(j));
             }
-            if (!check(columnIterator)) {
-                System.out.println("Найдены ошибки в столбце " + columnIterator.get(0));
+
+            //!!!не забыть создать новый errorList - он будет заполнен после каждого столбца
+            errorList = new ErrorList(columnIterator.get(0).getDataForCheck());
+            errorLists.add(errorList);    //создаю отдельные очереди для каждого столбца,
+            // для возможности расспараллелить проверки
+            if (!check(columnIterator, errorList)) {
+                System.out.println("Найдены ошибки в столбце " + columnIterator.get(0).getDataForCheck());
             } else {
-                System.out.println("Проверка по столбцу " + columnIterator.get(0) + " успешно пройдена");
+                System.out.println("Проверка по столбцу " + columnIterator.get(0).getDataForCheck() + " успешно пройдена");
             }
         }
     }
 
-    public static boolean check(List<String> columnObjects) {
-        ConfigObjectForValidation config = findChecker(columnObjects.get(0).trim()); // ищем тестовый ConfigObject по имени столбца
+    public static boolean check(List<ObjectForValidation> columnObjects, ErrorList errorList) {
+        ConfigObjectForValidation config = findChecker(columnObjects.get(0).getDataForCheck().trim()); // ищем тестовый ConfigObject по имени столбца
         if (config == null) {
-            System.out.println("check: Конфигурационный объект для " + columnObjects.get(0).trim() + " не найден");
+            System.out.println("check: Конфигурационный объект для " + columnObjects.get(0).getDataForCheck().trim() + " не найден");
             return false;
         } else {
             System.out.println("check: Объект для проверки найден");
-            if (validation(columnObjects, config)) {
+            if (validation(columnObjects, config, errorList)) {
                 System.out.println("check: Проверки пройдены успешно");
                 return true;
             } else {
@@ -61,12 +68,55 @@ public class App {
     }
 
     //фактическое проведение проверок (вынести в отдельный класс проверок
-    public static boolean validation(List<String> column, ConfigObjectForValidation config) {
-        checkIsEmpty(column);
-        checkIsUnique(column);
-        checkByRegulars(column,config);
+    public static boolean validation(List<ObjectForValidation> column, ConfigObjectForValidation config, ErrorList errorList) {
+        if (config.getIsNotEmpty()) {
+            if (!checkIsEmpty(column, errorList))
+                System.out.println("Ошибка при проверке столбца " + column.get(0).getDataForCheck() + "на не пустые ячейки");
+        }
+        if (config.getIsUnique()) {
+            if (!checkIsUnique(column, errorList))
+                System.out.println("Ошибка при проверке столбца " + column.get(0).getDataForCheck() + "на уникальность данных по столбцу");
+        }
+
+        //checkByRegulars(column, config);
 
         return false;
+    }
+
+    public static boolean checkIsEmpty(List<ObjectForValidation> column, ErrorList errorList) {
+        boolean returnSuccessFlag = true;
+
+        for (ObjectForValidation object : column) {
+            if (object.getDataForCheck().isEmpty()) {
+
+                errorList.addErrorToList(new ErrorObject(object.getRawExcel(), object.getColumnExcel(), "Поле не может быть пустым"));
+                returnSuccessFlag = false;
+            }
+        }
+        return returnSuccessFlag;
+    }
+
+    public static boolean checkIsUnique(List<ObjectForValidation> column, ErrorList errorList) {
+        boolean returnSuccessFlag = true;
+        String errorString = "";
+        boolean notUniqueflag = false;
+        for (int i = 1; i < column.size(); i++) {//от 1 так как первый элемент - заголовок
+            errorString = "Ошибка проверки на уникальность: дублируются строки "+ column.get(i).getRawExcel()+" (" + column.get(i).getDataForCheck()+")";
+            for (int j = 1; j < column.size(); j++) {
+                if (i == j) continue; //убираю сравнение самого с собой
+                notUniqueflag = false;
+
+                if (Objects.equals(column.get(i).getDataForCheck(), column.get(j).getDataForCheck())) {
+                    errorString = errorString + " и "+column.get(j).getRawExcel()+" (" + column.get(j).getDataForCheck()+")";
+                    notUniqueflag = true;
+                }
+            }
+            if (notUniqueflag) {
+                errorList.addErrorToList(new ErrorObject(column.get(i).getRawExcel(), column.get(i).getColumnExcel(), errorString));
+                returnSuccessFlag = false;
+            }
+        }
+        return returnSuccessFlag;
     }
 
     public static ConfigObjectForValidation findChecker(String fieldName) {
@@ -87,7 +137,7 @@ public class App {
         RegularsWithStrings regular = new RegularsWithStrings("^\\d{9}$", "Ошибка: в поле не только цифры или их количество не 9", "Проверяю что в поле только цифры");
         List<RegularsWithStrings> regularsList = new ArrayList<>();
         regularsList.add(regular);
-        configsList.add(new ConfigObjectForValidation("INN", false, true, regularsList));
+        configsList.add(new ConfigObjectForValidation("INN", true, true, regularsList));
 
         //Тестовые данные 2
         RegularsWithStrings regular2 = new RegularsWithStrings("^\\d{20}$", "Ошибка: в поле не только цифры или их количество не 20", "Ошибка: в поле не только цифры или их количество не 20");

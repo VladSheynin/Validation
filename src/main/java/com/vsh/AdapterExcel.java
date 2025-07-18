@@ -19,15 +19,16 @@ import java.util.List;
  */
 public class AdapterExcel {
 
-    static List<List<String>> getDataFromExcel(String fullExcelFilePath) throws IOException {
+    static List<List<ObjectForValidation>> getDataFromExcel(String fullExcelFilePath) throws IOException {
 
         FileInputStream inputStream = new FileInputStream(fullExcelFilePath);
         Workbook workbook = new XSSFWorkbook(inputStream);
         Sheet sheet = workbook.getSheetAt(0);
 
         DataFormatter formatter = new DataFormatter();
-        List<String> dataArray = new ArrayList<>();
-        List<List<String>> allDataByString = new ArrayList<>();
+        //List<String> dataArray = new ArrayList<>();
+        List<ObjectForValidation> validationObjects = new ArrayList<>();
+        List<List<ObjectForValidation>> allDataByString = new ArrayList<>();
 
         int rowSize = sheet.getPhysicalNumberOfRows();
         //System.out.println("Общее количество непустых строк = " + rowSize);
@@ -45,21 +46,21 @@ public class AdapterExcel {
             if (fieldName.isEmpty()) {
                 System.out.println("Ошибка в строке заголовков - есть пустые ячейки");
                 return null;
-            } else dataArray.add(fieldName);
+            } else validationObjects.add(new ObjectForValidation(fieldName,0,i));
         }
 
         //System.out.println(dataArray.toString());
-        allDataByString.add(new ArrayList<>(dataArray));
-        dataArray.clear();
+        allDataByString.add(new ArrayList<>(validationObjects));
+        validationObjects.clear();
 
         for (int j = 1; j < rowSize; j++) {
             row = sheet.getRow(j);
             for (int k = 0; k < columnCount; k++) {
-                dataArray.add(formatter.formatCellValue(row.getCell(k)));
+                validationObjects.add(new ObjectForValidation(formatter.formatCellValue(row.getCell(k)),j,k));
             }
             //  System.out.println("Строка " + j + " = " + dataArray.toString());
-            allDataByString.add(new ArrayList<>(dataArray));
-            dataArray.clear();
+            allDataByString.add(new ArrayList<>(validationObjects));
+            validationObjects.clear();
         }
         return allDataByString;
     }

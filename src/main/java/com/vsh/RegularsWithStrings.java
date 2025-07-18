@@ -7,13 +7,25 @@ package com.vsh;
  * @version 0.1
  */
 public class RegularsWithStrings {
-    String regular;
-    String errorMessage;
-    String workingMessage;
+    private final String regular;
+    private final String errorMessage;
+    private final String workingMessage;
 
     public RegularsWithStrings(String regular, String errorMessage, String workingMessage) {
         this.regular = regular;
         this.errorMessage = errorMessage;
         this.workingMessage = workingMessage;
+    }
+
+    public String getRegular() {
+        return regular;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public String getWorkingMessage() {
+        return workingMessage;
     }
 }

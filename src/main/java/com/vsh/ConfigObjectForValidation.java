@@ -10,10 +10,10 @@ import java.util.List;
  * @version 0.1
  */
 public class ConfigObjectForValidation {
-    String columnNameID;
-    boolean isNotEmpty;
-    boolean isUnique;
-    List<RegularsWithStrings> regulars = new ArrayList<>();
+    private final String columnNameID;
+    private final boolean isNotEmpty;
+    private final boolean isUnique;
+    private List<RegularsWithStrings> regulars = new ArrayList<>();
 
     public ConfigObjectForValidation(String columnNameID, boolean isNotEmpty, boolean isUnique, List<RegularsWithStrings> regulars) {
         this.columnNameID = columnNameID;
@@ -26,11 +26,11 @@ public class ConfigObjectForValidation {
         return columnNameID;
     }
 
-    public boolean isNotEmpty() {
+    public boolean getIsNotEmpty() {
         return isNotEmpty;
     }
 
-    public boolean isUnique() {
+    public boolean getIsUnique() {
         return isUnique;
     }
 
