@@ -56,6 +56,7 @@ public class AdapterExcel {
         for (int j = 1; j < rowSize; j++) {
             row = sheet.getRow(j);
             for (int k = 0; k < columnCount; k++) {
+                //TODO: сделать проверку что row не null (нет полностью пустой строки) иначе падает в ошибку NullPointerException
                 validationObjects.add(new ObjectForValidation(formatter.formatCellValue(row.getCell(k)),j,k));
             }
             //  System.out.println("Строка " + j + " = " + dataArray.toString());

@@ -31,7 +31,6 @@ public class ErrorList {
     @Override
     public String toString() {
         String string;
-
         if (errorListName.isEmpty())
             string = "ErrorList:";
         else
