@@ -1,5 +1,6 @@
 package com.vsh;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -9,7 +10,7 @@ import java.util.List;
  * @version 0.1
  */
 public class ErrorList {
-    private List<ErrorObject> errorObjectList;
+    private final List<ErrorObject> errorObjectList = new ArrayList<>();
     private String errorListName = "";
 
     public ErrorList() {
@@ -27,7 +28,7 @@ public class ErrorList {
         return errorObjectList;
     }
 
-    /*@Override
+    @Override
     public String toString() {
         String string;
 
@@ -40,5 +41,5 @@ public class ErrorList {
             string = string + "\n в ячейке (" + object.getRowExcel() + "," + object.getColumnExcel() + ") " + object.getErrorMessage();
         }
         return string;
-    }*/
+    }
 }
