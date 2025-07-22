@@ -27,18 +27,20 @@ public class CheckValidationHelper {
     public static List<ConfigObjectForValidation> getAllConfigObject() {
         List<ConfigObjectForValidation> configsList = new ArrayList<>();
         //Тестовые данные для INN
-        RegularsWithStrings regular = new RegularsWithStrings("^\\d{9}$", "Ошибка: в поле не только цифры или их количество не 9", "Проверяю что в поле только цифры");
+        RegularsWithStrings regular = new RegularsWithStrings("^\\d{9}$", "Ошибка: в ИНН не только цифры или их количество не 9", "Проверяю что в поле ИНН только цифры");
+        RegularsWithStrings regular1 = new RegularsWithStrings("^408.*", "Ошибка: ИНН начинается не с 123", "Проверяю на то что значение ИНН начинается с 123");
         List<RegularsWithStrings> regularsList = new ArrayList<>();
         regularsList.add(regular);
+        regularsList.add(regular1);
         configsList.add(new ConfigObjectForValidation("INN", true, true, regularsList));
 
         //Тестовые данные 2 для Account
         RegularsWithStrings regular2 = new RegularsWithStrings("^\\d{20}$", "Ошибка: в поле не только цифры или их количество не 20", "Ошибка: в поле не только цифры или их количество не 20");
         RegularsWithStrings regular3 = new RegularsWithStrings("^408.*", "Ошибка: номер счета начинается не с 408", "Проверяю на то что значение начинается с 408");
         List<RegularsWithStrings> regularsList2 = new ArrayList<>();
-        regularsList.add(regular2);
-        regularsList.add(regular3);
-        configsList.add(new ConfigObjectForValidation("account", true, true, regularsList));
+        regularsList2.add(regular2);
+        regularsList2.add(regular3);
+        configsList.add(new ConfigObjectForValidation("account-false", true, true, regularsList2));
         return configsList;
     }
 
@@ -91,10 +93,46 @@ public class CheckValidationHelper {
                 returnSuccessFlag = false;
             }
         }
-        //checkByRegulars(column, config);
+        if (!config.getRegulars().isEmpty()) {
+            checkByRegulars(column, config, errorList);
+        }
 
         return returnSuccessFlag;
     }
+
+    /**
+     * Проверка ячеек по списку регулярных выражений
+     *
+     * @param column    - список элементов для проверки
+     * @param config    - объект конфигурации
+     * @param errorList - список ошибок
+     * @return true - если значение ячейки удовлетворяет маске регулярки, false - если не удовлетворяет
+     * добавляет строки с ошибками в errorList
+     */
+    public static boolean checkByRegulars(List<ObjectForValidation> column, ConfigObjectForValidation config, ErrorList errorList) {
+        boolean returnSuccessFlag = true;
+        List<RegularsWithStrings> regulars = config.getRegulars();
+        for (ObjectForValidation object : column) {
+            for (RegularsWithStrings regular : regulars) {
+                System.out.println(regular.getWorkingMessage() + ", строка " + object.getRawExcel());
+                if (!checkOneRegularByStrings(object.getDataForCheck(), regular.getRegular())) {
+                    System.out.println(regular.getErrorMessage() + " в строке " + object.getRawExcel());
+                }
+            }
+        }
+        return returnSuccessFlag;
+    }
+
+    /**Проверка значения в ячейке по конкретной регулярке
+     *
+     * @param objectString - строка со значением ячейки
+     * @param regularString - строка с регулярным выражением
+     * @return true - значение ячейки соответствует регулярке, false - не соответствует
+     */
+    public static boolean checkOneRegularByStrings(String objectString, String regularString) {
+        return objectString.matches(regularString);
+    }
+
 
     /**
      * Проверка на то что ячейка не должна быть пустой

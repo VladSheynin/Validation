@@ -26,7 +26,6 @@ public class AdapterExcel {
         Sheet sheet = workbook.getSheetAt(0);
 
         DataFormatter formatter = new DataFormatter();
-        //List<String> dataArray = new ArrayList<>();
         List<ObjectForValidation> validationObjects = new ArrayList<>();
         List<List<ObjectForValidation>> allDataByString = new ArrayList<>();
 

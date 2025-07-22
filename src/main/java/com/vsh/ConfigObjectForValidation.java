@@ -44,7 +44,6 @@ public class ConfigObjectForValidation {
      * @return
      */
     public boolean validationFormatCheck() {
-
         return true;
     }
 
