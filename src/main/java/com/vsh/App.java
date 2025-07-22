@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.vsh.AdapterExcel.getDataFromExcel;
+import static com.vsh.AdapterExcel.writeDataToExcel;
 
 /**
  * Базовый класс
@@ -52,7 +53,12 @@ public class App {
 
         }
         for (ErrorList error : errorLists) {
-            System.out.println(error.toString());
+            try {
+                writeDataToExcel(fileFullPathName,error);
+            } catch (IOException e) {
+                System.out.println("Файл " + fileFullPathName + " не доступен (отсутствует или занят/открыт в данный момент");
+            }
+            //System.out.println(error.toString());
         }
     }
 }
