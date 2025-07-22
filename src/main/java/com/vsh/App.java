@@ -38,18 +38,21 @@ public class App {
 
             errorList = new ErrorList("Столбец " + columnIterator.get(0).getDataForCheck());
             errorLists.add(errorList);    //создаю отдельные очереди для каждого столбца,
+            ConfigObjectForValidation config; //объект конфигурации
             //TODO: распараллелить проверки по отдельным потокам
-            if (!CheckValidationHelper.check(columnIterator, errorList)) {
-                System.out.println("Найдены ошибки в столбце " + columnIterator.get(0).getDataForCheck());
-            } else {
-                System.out.println("Проверка по столбцу " + columnIterator.get(0).getDataForCheck() + " успешно пройдена");
-            }
-        }
 
+            // получаем объект конфигурации и стартуем с ним проверки
+            config = CheckValidationHelper.getConfigurationObject(columnIterator.get(0).getDataForCheck());
+            if (config == null) {
+                System.out.println("Объект конфигурации для " + columnIterator.get(0).getDataForCheck() + " не найден");
+            } else {
+                System.out.println("Объект конфигурации для " + columnIterator.get(0).getDataForCheck() + " найден. Стартую проверки");
+                CheckValidationHelper.validation(columnIterator, config, errorList);
+            }
+
+        }
         for (ErrorList error : errorLists) {
             System.out.println(error.toString());
         }
     }
-
-
 }
