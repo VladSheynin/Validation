@@ -40,25 +40,18 @@ public class CheckValidationHelper {
         List<RegularsWithStrings> regularsList2 = new ArrayList<>();
         regularsList2.add(regular2);
         regularsList2.add(regular3);
-        configsList.add(new ConfigObjectForValidation("account", true, true, regularsList2));
+        configsList.add(new ConfigObjectForValidation("account-false", true, true, regularsList2));
         return configsList;
     }
 
     /**
-     * Поиск тестового оъекта для столбца и отправку, если таковой найден, столбца на проерки
+     * Поиск тестового объекта для столбца и отправку, если таковой найден, столбца на проерки
      *
      * @param columnName - строка с именем столбца
      * @return - объект конфигурации если найден, иначе null
      */
     public static ConfigObjectForValidation getConfigurationObject(String columnName) {
-        ConfigObjectForValidation config = findChecker(columnName.trim()); // ищем тестовый ConfigObject по имени столбца
-        if (config == null) {
-            //System.out.println("Конфигурационный объект для " + columnName + " не найден");
-            return null;
-        } else {
-            //System.out.println("Конфигурационный объект для " + columnName + " найден");
-            return config;
-        }
+        return findChecker(columnName.trim());
     }
 
     /**
@@ -161,21 +154,22 @@ public class CheckValidationHelper {
      */
     public static boolean checkIsUnique(List<ObjectForValidation> column, ErrorList errorList) {
         boolean returnSuccessFlag = true;
-        String errorString = "";
+        String errorString;
         boolean notUniqueflag = false;
         for (int i = 1; i < column.size(); i++) {//от 1 так как нулевой элемент - заголовок
             errorString = "Ошибка проверки на уникальность: дублируются строки " + (column.get(i).getRawExcel()+1) + " (" + column.get(i).getDataForCheck() + ")";
+            notUniqueflag = false;
             for (int j = 1; j < column.size(); j++) {
                 if (i == j) continue; //убираю сравнение самого с собой
-                notUniqueflag = false;
+
                 if (Objects.equals(column.get(i).getDataForCheck(), column.get(j).getDataForCheck())) {
                     errorString = errorString + " и " + (column.get(j).getRawExcel()+1) + " (" + column.get(j).getDataForCheck() + ")";
                     notUniqueflag = true;
                 }
-                if (notUniqueflag) {
-                    errorList.addErrorToList(new ErrorObject(column.get(i).getRawExcel(), column.get(i).getColumnExcel(), errorString));
-                    returnSuccessFlag = false;
-                }
+            }
+            if (notUniqueflag) {
+                errorList.addErrorToList(new ErrorObject(column.get(i).getRawExcel(), column.get(i).getColumnExcel(), errorString));
+                returnSuccessFlag = false;
             }
         }
         return returnSuccessFlag;
