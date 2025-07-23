@@ -1,5 +1,9 @@
 package com.vsh;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,13 +13,18 @@ import java.util.List;
  * @author Владислав Шейнин (начало разработки 17.07.2025)
  * @version 0.1
  */
-public class ConfigObjectForValidation {
-    private final String columnNameID;
-    private final boolean isNotEmpty;
-    private final boolean isUnique;
+public class ConfigObjectForValidation implements Serializable {
+    private String columnNameID;
+    private boolean isNotEmpty;
+    private boolean isUnique;
     private List<RegularsWithStrings> regulars = new ArrayList<>();
 
-    public ConfigObjectForValidation(String columnNameID, boolean isNotEmpty, boolean isUnique, List<RegularsWithStrings> regulars) {
+    @JsonCreator
+    public ConfigObjectForValidation(
+            @JsonProperty("columnNameID") String columnNameID,
+            @JsonProperty("isNotEmpty") boolean isNotEmpty,
+            @JsonProperty("isUnique") boolean isUnique,
+            @JsonProperty("regulars") List<RegularsWithStrings> regulars) {
         this.columnNameID = columnNameID;
         this.isNotEmpty = isNotEmpty;
         this.isUnique = isUnique;
@@ -26,11 +35,11 @@ public class ConfigObjectForValidation {
         return columnNameID;
     }
 
-    public boolean getIsNotEmpty() {
+    public boolean isNotEmpty() {
         return isNotEmpty;
     }
 
-    public boolean getIsUnique() {
+    public boolean isUnique() {
         return isUnique;
     }
 

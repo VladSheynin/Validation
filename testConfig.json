@@ -1,36 +1,27 @@
-[
-  {
-    "name": "INN",
-	"isUnique": "true",
-	"notNull": "true",
-    "regulars": [
-      {
-        "regularValue": "^\\d{9}$",
-        "errorMessage": "Ошибка: в поле не только цифры или их количество не 9"
-		"workingMessge": "Проверяю что в поле только цифры"
-      },
-      {
-        "regularValue": ".*3.*",
-        "errorMessage": "Ошибка: поле должно содержать хотя бы одну тройку "
-		"workingMessge": "Проверяю на то что в поле должна быть хотя бы одна тройка"
-      }
-    ]
-  },
-  {
-	"name": "ACCOUNT",
-	"isUnique": "false",
-	"notNull": "true",
-    "regulars": [
-      {
-        "regularValue": "^\\d{20}$",
-        "errorMessage": "Ошибка: в поле не только цифры или их количество не 20"
-		"workingMessge": "Проверяю что в поле только цифры"
-      },
-      {
-        "regularValue": "^408.*",
-        "errorMessage": "Ошибка: номер счета начинается не с 408"
-		"workingMessge": "Проверяю на то что значение начинается с 408"
-      }
-    ]
-  }
-]
+[ {
+  "columnNameID" : "INN",
+  "isNotEmpty" : true,
+  "isUnique" : true,
+  "regulars" : [ {
+    "regular" : "^\\d{9}$",
+    "errorMessage" : "Ошибка: в ИНН не только цифры или их количество не 9",
+    "workingMessage" : "Проверяю что в поле ИНН только цифры и их ровно 9"
+  }, {
+    "regular" : "^123.*",
+    "errorMessage" : "Ошибка: ИНН начинается не с 123",
+    "workingMessage" : "Проверяю на то что значение ИНН начинается с 123"
+  } ]
+}, {
+  "columnNameID" : "account-false",
+  "isNotEmpty" : true,
+  "isUnique" : true,
+  "regulars" : [ {
+    "regular" : "^\\d{20}$",
+    "errorMessage" : "Ошибка: в поле не только цифры или их количество не 20",
+    "workingMessage" : "Ошибка: в поле не только цифры или их количество не 20"
+  }, {
+    "regular" : "^408.*",
+    "errorMessage" : "Ошибка: номер счета начинается не с 408",
+    "workingMessage" : "Проверяю на то что значение начинается с 408"
+  } ]
+} ]

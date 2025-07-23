@@ -1,29 +1,33 @@
 package com.vsh;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+
+
 
 public class CheckValidationHelper {
     static List<ConfigObjectForValidation> configsList;
 
-    //получаю все объекты валидации из метода
-    public CheckValidationHelper() {
-        configsList = getAllConfigObject();
-    }
-
-    //TODO:получение все объекты валидации из фалйа
+    /** Получение всех объектов валидации из фалйа
+     *
+     * @param file - имя файла, в котором лежат объекты
+     */
     public CheckValidationHelper(File file) {
-        //получить строку json из файла и создать объект
+        ObjectMapper objectMapper = new ObjectMapper();
+        System.out.print("Читаю конфигурацию из файла "+file.getAbsolutePath()+" : ");
+        try {
+            configsList = objectMapper.readValue(file, objectMapper.getTypeFactory().constructCollectionType(List.class, ConfigObjectForValidation.class));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println("OK");
     }
 
-    //TODO:получение все объекты валидации из json-а
-    public CheckValidationHelper(String jsonString) {
-        //jsonString.structureValidation();
-    }
-
-    //тестовое наполнение конфигурацией - переделать на получение из json или базы
+/*    //тестовое наполнение конфигурацией - переделать на получение из json или базы
     public static List<ConfigObjectForValidation> getAllConfigObject() {
         List<ConfigObjectForValidation> configsList = new ArrayList<>();
         //Тестовые данные для INN
@@ -42,7 +46,7 @@ public class CheckValidationHelper {
         regularsList2.add(regular3);
         configsList.add(new ConfigObjectForValidation("account-false", true, true, regularsList2));
         return configsList;
-    }
+    }*/
 
     /**
      * Поиск тестового объекта для столбца и отправку, если таковой найден, столбца на проерки
@@ -64,13 +68,13 @@ public class CheckValidationHelper {
      */
     public static boolean validation(List<ObjectForValidation> column, ConfigObjectForValidation config, ErrorList errorList) {
         boolean returnSuccessFlag = true;
-        if (config.getIsNotEmpty()) {
+        if (config.isNotEmpty()) {
             if (!checkIsEmpty(column, errorList)) {
                 System.out.println("Ошибка при проверке столбца " + column.get(0).getDataForCheck() + " на не пустые ячейки");
                 returnSuccessFlag = false;
             }
         }else System.out.println("Отсутствует проверка на пустые поля");
-        if (config.getIsUnique()) {
+        if (config.isUnique()) {
             if (!checkIsUnique(column, errorList)) {
                 System.out.println("Ошибка при проверке столбца " + column.get(0).getDataForCheck() + " на уникальность данных по столбцу");
                 returnSuccessFlag = false;

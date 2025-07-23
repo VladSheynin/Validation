@@ -3,6 +3,7 @@ package com.vsh;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -17,7 +18,14 @@ import java.util.List;
  */
 public class AdapterExcel {
 
-    static List<List<ObjectForValidation>> getDataFromExcel(String fullExcelFilePath) throws IOException {
+    /**
+     * Метод получения данных из Excel и раскладывания их в набор столбцов с данными - List<List<ObjectForValidation>>
+     *
+     * @param fullExcelFilePath - путь к Excel файлу
+     * @return List<List < ObjectForValidation>> - список столбцов из Excel-я разложенный в объекты ObjectForValidation
+     * @throws IOException
+     */
+    public static List<List<ObjectForValidation>> getDataFromExcel(File fullExcelFilePath) throws IOException {
         FileInputStream inputStream = new FileInputStream(fullExcelFilePath);
         Workbook workbook = new XSSFWorkbook(inputStream);
         Sheet sheet = workbook.getSheetAt(0);
@@ -25,7 +33,7 @@ public class AdapterExcel {
         DataFormatter formatter = new DataFormatter();
         List<ObjectForValidation> validationObjects = new ArrayList<>();
         List<List<ObjectForValidation>> allDataByString = new ArrayList<>();
-
+        System.out.println("Читаю данные из файла " + fullExcelFilePath.getAbsolutePath());
         int rowSize = sheet.getPhysicalNumberOfRows();
         //System.out.println("Общее количество непустых строк = " + rowSize);
         int columnCount;
@@ -44,7 +52,6 @@ public class AdapterExcel {
                 return null;
             } else validationObjects.add(new ObjectForValidation(fieldName, 0, i));
         }
-
         //System.out.println(dataArray.toString());
         allDataByString.add(new ArrayList<>(validationObjects));
         validationObjects.clear();
@@ -63,10 +70,16 @@ public class AdapterExcel {
         return allDataByString;
     }
 
-    static void writeDataToExcel(String fullExcelFilePath, ErrorList errorList) throws IOException {
+    /**
+     * Метод записи Примечаний в Excel-файл из списка ошибок (из объектов ObjectForValidation)
+     *
+     * @param fullExcelFilePath -имя Excel-файла
+     * @param errorList         - список ошибок из которого формируются Примечания
+     * @throws IOException
+     */
+    public static void writeDataToExcel(File fullExcelFilePath, ErrorList errorList) throws IOException {
         // Загружаем книгу из файла
-        try (FileInputStream fis = new FileInputStream(fullExcelFilePath);
-             Workbook workbook = new XSSFWorkbook(fis)) {
+        try (FileInputStream fis = new FileInputStream(fullExcelFilePath); Workbook workbook = new XSSFWorkbook(fis)) {
 
             Sheet sheet = workbook.getSheetAt(0);
             if (sheet == null) {
@@ -74,7 +87,7 @@ public class AdapterExcel {
             }
 
             List<ErrorObject> errorObjectList = errorList.getAllErrorObject();
-            for (ErrorObject error : errorObjectList){
+            for (ErrorObject error : errorObjectList) {
                 cellSet(workbook, sheet, error.getRowExcel(), error.getColumnExcel(), error.getErrorMessage());
             }
 
@@ -114,7 +127,7 @@ public class AdapterExcel {
         } else {
             // Если комментарий есть, просто обновим якорь
             comment.setAddress(1, 1);
-            newtext = comment.getString() +"\n"+commentText;
+            newtext = comment.getString() + "\n" + commentText;
         }
 
         // Устанавливаем текст и автора
