@@ -69,7 +69,7 @@ public class App {
 
         }
         if (hasErrorAllFile) {
-            System.out.println("Есть ошибки, смотри примечания на ячейках в исходном файле Excel");
+            System.out.print("Есть ошибки, смотри примечания на ячейках в исходном файле Excel. Идет запись:");
             for (ErrorList error : errorLists) {
                 try {
                     adapterExcel.writeDataToExcel(error);
@@ -78,6 +78,7 @@ public class App {
                 }
 
             }
+            System.out.println(" ОК");
         }
     }
 }
