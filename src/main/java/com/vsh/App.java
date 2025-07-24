@@ -33,7 +33,7 @@ public class App {
 
         List<List<ObjectForValidation>> allDataFromExcel;
         try {
-            allDataFromExcel = adapterExcel.getDataFromExcel();
+            allDataFromExcel = adapterExcel.readFromExcel();
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return;

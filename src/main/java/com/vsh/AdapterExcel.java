@@ -52,7 +52,7 @@ public class AdapterExcel {
      *
      * @return List<List < ObjectForValidation>> - список столбцов из Excel-я разложенный в объекты ObjectForValidation
      */
-    public List<List<ObjectForValidation>> getDataFromExcel() {
+    public List<List<ObjectForValidation>> readFromExcel() throws IOException {
         Sheet sheet;
         try (Workbook workbook = new XSSFWorkbook(file)) {
             sheet = workbook.getSheetAt(0);
@@ -67,16 +67,16 @@ public class AdapterExcel {
         int rowSize = sheet.getPhysicalNumberOfRows();
         //System.out.println("Общее количество непустых строк = " + rowSize);
         int columnCount;
-        Row row;
-        Row firstRow = sheet.getRow(0);
-        if (firstRow == null) {
+        //Row row;
+        Row row = sheet.getRow(0);
+        if (row == null) {
             System.out.println("Ошибка в строке заголовков - пустая строка");
             return null;
         }
-        columnCount = firstRow.getLastCellNum(); // Вернёт количество столбцов в первой строке
+        columnCount = row.getLastCellNum(); // Вернёт количество столбцов в первой строке
         //System.out.println("Число столбцов в первой строке = " + columnCount);
         for (int i = 0; i < columnCount; i++) {
-            String fieldName = formatter.formatCellValue(firstRow.getCell(i));
+            String fieldName = formatter.formatCellValue(row.getCell(i));
             if (fieldName.isEmpty()) {
                 System.out.println("Ошибка в строке заголовков - есть пустые ячейки");
                 return null;
@@ -88,8 +88,9 @@ public class AdapterExcel {
 
         for (int j = 1; j < rowSize; j++) {
             row = sheet.getRow(j);
+            if (row == null)
+                throw new IOException("Пустая строка номер " + (j + 1) + " в данных");//continue; - такое решение позволит пропускать пустые строки
             for (int k = 0; k < columnCount; k++) {
-                //TODO: сделать проверку что row не null (нет полностью пустой строки) иначе падает в ошибку NullPointerException
                 validationObjects.add(new ObjectForValidation(formatter.formatCellValue(row.getCell(k)), j, k));
             }
             //  System.out.println("Строка " + j + " = " + dataArray.toString());
