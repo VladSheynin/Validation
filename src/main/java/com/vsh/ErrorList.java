@@ -31,11 +31,9 @@ public class ErrorList {
     @Override
     public String toString() {
         String string;
-        if (errorListName.isEmpty())
-            string = "ErrorList:";
-        else
-            string = this.errorListName + ": ";
-        if(errorObjectList.isEmpty())return "";
+        if (errorListName.isEmpty()) string = "ErrorList:";
+        else string = this.errorListName + ": ";
+        if (errorObjectList.isEmpty()) return "";
         for (ErrorObject object : errorObjectList) {
             string = string + "\n в ячейке (" + object.getRowExcel() + "," + object.getColumnExcel() + ") " + object.getErrorMessage();
         }

@@ -1,0 +1,206 @@
+[
+  {
+    "columnNameID": "NUM_ID",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^(\\d+(\\/\\d+)+|[бБ]\\/[нН])$",
+        "errorMessage": "Ошибка: в поле должны быть только числа разделенные \\ или б\\н",
+        "workingMessage": "Проверка: в поле числа разделенные \\ или б\\н"
+      }
+    ]
+  },
+  {
+    "columnNameID": "DATE_ID",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^(0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[0-2])\\.(\\d{4})$",
+        "errorMessage": "Ошибка: в поле не дата в формате dd.mm.yyyy",
+        "workingMessage": "Проверка: в поле дата в формате dd.mm.yyyy"
+      }
+    ]
+  },
+  {
+    "columnNameID": "BIRTH_DATE",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^(0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[0-2])\\.(\\d{4})$",
+        "errorMessage": "Ошибка: в поле не дата в формате dd.mm.yyyy",
+        "workingMessage": "Проверка: в поле дата в формате dd.mm.yyyy"
+      }
+    ]
+  },
+  {
+    "columnNameID": "NUM_PR",
+    "isNotEmpty": true,
+    "isUnique": true,
+    "regulars": [
+      {
+        "regular": "^\\d+(\\/\\d+)+(-[А-ЯЁ]{2})?$",
+        "errorMessage": "Ошибка: поле не вида несколько цифр через слэш и две буквы после тире",
+        "workingMessage": "Проверка: поле вида несколько цифр через слэш и две буквы после тире"
+      }
+    ]
+  },
+  {
+    "columnNameID": "DATE_PR",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^(0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[0-2])\\.(\\d{4})$",
+        "errorMessage": "Ошибка: в поле не дата в формате dd.mm.yyyy",
+        "workingMessage": "Проверка: в поле дата в формате dd.mm.yyyy"
+      }
+    ]
+  },
+  {
+    "columnNameID": "kod",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^\\d{7}$",
+        "errorMessage": "Ошибка: в поле не только цифры или их не ровно 7",
+        "workingMessage": "Проверка: в поле строго 7 цифр"
+      }
+    ]
+  },
+  {
+    "columnNameID": "ACCOUNT",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^\\d{20}(,\\s*\\d{20})*$",
+        "errorMessage": "Ошибка: в поле данные не по формату - должны быть счета по 20 цифр, разделенные запятой",
+        "workingMessage": "Проверка: в поле должны быть только счета (20 цифр) разделенные запятой"
+      }
+    ]
+  },
+  {
+    "columnNameID": "SUM",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^\\d+\\.\\d{1,2}$",
+        "errorMessage": "Ошибка: в поле должна быть сумма с копейками после точки",
+        "workingMessage": "Проверка: в поле должна быть сумма с копейками после точки"
+      }
+    ]
+  },
+  {
+    "columnNameID": "UIN_REC",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^\\d{20}$",
+        "errorMessage": "Ошибка: в поле не только цифры или их не ровно 20",
+        "workingMessage": "Проверка: в поле строго 20 цифр"
+      }
+    ]
+  },
+  {
+    "columnNameID": "SORT_BY_NUM",
+    "isNotEmpty": false,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^\\s*$",
+        "errorMessage": "Ошибка: поле не пустое",
+        "workingMessage": "Проверка: должно быть пустым или содержать только пробелы"
+      }
+    ]
+  },
+  {
+    "columnNameID": "ACCOUNT_REC",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^\\d{20}$",
+        "errorMessage": "Ошибка: в поле не только цифры или их не ровно 20",
+        "workingMessage": "Проверка: в поле строго 20 цифр"
+      }
+    ]
+  },
+  {
+    "columnNameID": "INN_REC",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^\\d{10}$",
+        "errorMessage": "Ошибка: в поле не только цифры или их не ровно 10",
+        "workingMessage": "Проверка: в поле строго 10 цифр"
+      }
+    ]
+  },
+  {
+    "columnNameID": "KPP_REC",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^\\d{9}$",
+        "errorMessage": "Ошибка: в поле не только цифры или их не ровно 9",
+        "workingMessage": "Проверка: в поле строго 9 цифр"
+      }
+    ]
+  },
+  {
+    "columnNameID": "ORG_REC",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": []
+  },
+  {
+    "columnNameID": "BANK_REC",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^\\d{9}$",
+        "errorMessage": "Ошибка: в поле не только цифры или их не ровно 9",
+        "workingMessage": "Проверка: в поле строго 9 цифр"
+      }
+    ]
+  },
+  {
+    "columnNameID": "OKTMO_REC",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^\\d{8}$",
+        "errorMessage": "Ошибка: в поле не только цифры или их не ровно 8",
+        "workingMessage": "Проверка: в поле строго 8 цифр"
+      }
+    ]
+  },
+  {
+    "columnNameID": "FILE_NAMES",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": []
+  },
+  {
+    "columnNameID": "data registracii",
+    "isNotEmpty": true,
+    "isUnique": false,
+    "regulars": [
+      {
+        "regular": "^(0[1-9]|[12][0-9]|3[01])\\.(0[1-9]|1[0-2])\\.(\\d{4})$",
+        "errorMessage": "Ошибка: в поле не дата в формате dd.mm.yyyy",
+        "workingMessage": "Проверка: в поле дата в формате dd.mm.yyyy"
+      }
+    ]
+  }
+]

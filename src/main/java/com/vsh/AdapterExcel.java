@@ -1,12 +1,11 @@
 package com.vsh;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,22 +17,53 @@ import java.util.List;
  */
 public class AdapterExcel {
 
+    private final File file;
+    IndexedColors color;
+    FillPatternType type;
+
+
+    public AdapterExcel(IndexedColors color, FillPatternType type, File file) throws FileNotFoundException {
+        if (checkFile(file)) {
+            this.color = color;
+            this.type = type;
+            this.file = file;
+        } else {
+            throw new FileNotFoundException();
+        }
+    }
+
+    /**
+     * Проверка, что файл существует и можно работать дальше
+     *
+     * @param file - файл
+     * @return true - существует, false - не существует
+     */
+    private boolean checkFile(File file) {
+        if (!file.exists()) {
+            System.out.println("Файл " + file.getAbsolutePath() + " не существует");
+            return false;
+        }
+        return true;
+    }
+
     /**
      * Метод получения данных из Excel и раскладывания их в набор столбцов с данными - List<List<ObjectForValidation>>
+     * для чтения используется file - Excel файл
      *
-     * @param fullExcelFilePath - путь к Excel файлу
      * @return List<List < ObjectForValidation>> - список столбцов из Excel-я разложенный в объекты ObjectForValidation
-     * @throws IOException
      */
-    public static List<List<ObjectForValidation>> getDataFromExcel(File fullExcelFilePath) throws IOException {
-        FileInputStream inputStream = new FileInputStream(fullExcelFilePath);
-        Workbook workbook = new XSSFWorkbook(inputStream);
-        Sheet sheet = workbook.getSheetAt(0);
+    public List<List<ObjectForValidation>> getDataFromExcel() {
+        Sheet sheet;
+        try (Workbook workbook = new XSSFWorkbook(file)) {
+            sheet = workbook.getSheetAt(0);
+        } catch (NotOfficeXmlFileException | IOException | InvalidFormatException e) {
+            throw new NotOfficeXmlFileException("Структура файла " + file.getAbsolutePath() + " не является Excel или файл заблокирован");
+        }
 
         DataFormatter formatter = new DataFormatter();
         List<ObjectForValidation> validationObjects = new ArrayList<>();
         List<List<ObjectForValidation>> allDataByString = new ArrayList<>();
-        System.out.println("Читаю данные из файла " + fullExcelFilePath.getAbsolutePath());
+        System.out.println("Читаю данные из файла " + file.getAbsolutePath());
         int rowSize = sheet.getPhysicalNumberOfRows();
         //System.out.println("Общее количество непустых строк = " + rowSize);
         int columnCount;
@@ -66,20 +96,19 @@ public class AdapterExcel {
             allDataByString.add(new ArrayList<>(validationObjects));
             validationObjects.clear();
         }
-        inputStream.close();
+        //inputStream.close();
         return allDataByString;
     }
 
     /**
      * Метод записи Примечаний в Excel-файл из списка ошибок (из объектов ObjectForValidation)
+     * для записи используется file - Excel файл
      *
-     * @param fullExcelFilePath -имя Excel-файла
-     * @param errorList         - список ошибок из которого формируются Примечания
-     * @throws IOException
+     * @param errorList - список ошибок из которого формируются Примечания
      */
-    public static void writeDataToExcel(File fullExcelFilePath, ErrorList errorList) throws IOException {
+    public void writeDataToExcel(ErrorList errorList) throws IOException {
         // Загружаем книгу из файла
-        try (FileInputStream fis = new FileInputStream(fullExcelFilePath); Workbook workbook = new XSSFWorkbook(fis)) {
+        try (FileInputStream fis = new FileInputStream(file); Workbook workbook = new XSSFWorkbook(fis)) {
 
             Sheet sheet = workbook.getSheetAt(0);
             if (sheet == null) {
@@ -92,14 +121,23 @@ public class AdapterExcel {
             }
 
             // Сохраняем книгу обратно в тот же файл
-            try (FileOutputStream fos = new FileOutputStream(fullExcelFilePath)) {
+            try (FileOutputStream fos = new FileOutputStream(file)) {
                 workbook.write(fos);
             }
         }
     }
 
-
-    private static void cellSet(Workbook workbook, Sheet sheet, int rowIndex, int colIndex, String commentText) {
+    /**
+     * Наполнение Примечания конкретной ячейки
+     * если Примечание в ячейке не пустое - данные добавляются в то же Примечание на следующую строку
+     *
+     * @param workbook    - книга
+     * @param sheet       - страница
+     * @param rowIndex    - строка
+     * @param colIndex    - столбец
+     * @param commentText - текст, которым нужно заполнить примечание
+     */
+    private void cellSet(Workbook workbook, Sheet sheet, int rowIndex, int colIndex, String commentText) {
         Row row = sheet.getRow(rowIndex);
         if (row == null) row = sheet.createRow(rowIndex);
 
@@ -118,20 +156,27 @@ public class AdapterExcel {
         anchor.setRow1(rowIndex);
         anchor.setRow2(rowIndex + 18);
 
+        CellStyle fillStyle = workbook.createCellStyle();
+
+        //закрашиваю ячейку с ошибкой в нужный цвет
+        fillStyle.setFillForegroundColor(color.getIndex());
+        fillStyle.setFillPattern(type);
+        cell.setCellStyle(fillStyle);
+
+        //создаю примечание
         Comment comment = cell.getCellComment();
-        String newtext;
+        String newText;
         if (comment == null) {
-            // Создаем новый комментарий, если отсутствует
             comment = drawing.createCellComment(anchor);
-            newtext = commentText;
+            newText = commentText;
         } else {
             // Если комментарий есть, просто обновим якорь
             comment.setAddress(1, 1);
-            newtext = comment.getString() + "\n" + commentText;
+            newText = comment.getString() + "\n" + commentText;
         }
 
         // Устанавливаем текст и автора
-        RichTextString richText = helper.createRichTextString(newtext);
+        RichTextString richText = helper.createRichTextString(newText);
         comment.setString(richText);
         comment.setAuthor("Alcyone");
 

@@ -1,5 +1,11 @@
 package com.vsh;
 
+/**
+ * Объект ошибка, содержащий позицию ошибки и текст ошибки
+ *
+ * @author Владислав Шейнин (начало разработки 17.07.2025)
+ * @version 0.1
+ */
 public class ErrorObject {
     private final int rowExcel;
     private final int columnExcel;

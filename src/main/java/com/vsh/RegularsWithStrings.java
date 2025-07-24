@@ -7,6 +7,7 @@ import java.io.Serializable;
 
 /**
  * Объект, который содержит регулярное выражение и сообщения для логирования и описания ошибки
+ *
  * @author Владислав Шейнин (начало разработки 18.07.2025)
  * @version 0.1
  */
@@ -16,10 +17,7 @@ public class RegularsWithStrings implements Serializable {
     private String workingMessage;
 
     @JsonCreator
-    public RegularsWithStrings(
-            @JsonProperty("regular") String regular,
-            @JsonProperty("errorMessage") String errorMessage,
-            @JsonProperty("workingMessage") String workingMessage) {
+    public RegularsWithStrings(@JsonProperty("regular") String regular, @JsonProperty("errorMessage") String errorMessage, @JsonProperty("workingMessage") String workingMessage) {
         this.regular = regular;
         this.errorMessage = errorMessage;
         this.workingMessage = workingMessage;

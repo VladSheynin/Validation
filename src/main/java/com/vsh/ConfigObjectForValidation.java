@@ -20,11 +20,7 @@ public class ConfigObjectForValidation implements Serializable {
     private List<RegularsWithStrings> regulars = new ArrayList<>();
 
     @JsonCreator
-    public ConfigObjectForValidation(
-            @JsonProperty("columnNameID") String columnNameID,
-            @JsonProperty("isNotEmpty") boolean isNotEmpty,
-            @JsonProperty("isUnique") boolean isUnique,
-            @JsonProperty("regulars") List<RegularsWithStrings> regulars) {
+    public ConfigObjectForValidation(@JsonProperty("columnNameID") String columnNameID, @JsonProperty("isNotEmpty") boolean isNotEmpty, @JsonProperty("isUnique") boolean isUnique, @JsonProperty("regulars") List<RegularsWithStrings> regulars) {
         this.columnNameID = columnNameID;
         this.isNotEmpty = isNotEmpty;
         this.isUnique = isUnique;
