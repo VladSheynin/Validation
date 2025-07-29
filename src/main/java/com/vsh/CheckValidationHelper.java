@@ -3,8 +3,8 @@ package com.vsh;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,31 +16,31 @@ import java.util.Objects;
  */
 public class CheckValidationHelper {
     private List<ConfigObjectForValidation> configsList;
+    private File file;
 
-    public CheckValidationHelper(File file) throws FileNotFoundException {
-        if (!checkFile(file)) throw new FileNotFoundException();
-        else try {
-            getConfigObjectsFromFile(file);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            throw new FileNotFoundException();
-        }
+    public CheckValidationHelper() {
+        configsList = new ArrayList<>();
     }
 
     /**
      * Метод получающий объекты из json-файла и складывающий их в List<ConfigObjectForValidation> configsList
-     *
-     * @param file - файл
      */
-    private void getConfigObjectsFromFile(File file) throws Exception {
+    public boolean getConfigObjectsFromFile()  {
+        if (file == null) {
+            System.out.println("Файл не проинициализирован - выполните setFile");
+            return false;
+        }
+
         ObjectMapper objectMapper = new ObjectMapper();
         System.out.print("Читаю конфигурацию из файла " + file.getAbsolutePath() + " : ");
         try {
             configsList = objectMapper.readValue(file, objectMapper.getTypeFactory().constructCollectionType(List.class, ConfigObjectForValidation.class));
         } catch (IOException e) {
-            throw new Exception("Файл " + file.getAbsolutePath() + " не является правильным файлом конфигурации или файл заблокирован");
+            System.out.println("Файл " + file.getAbsolutePath() + " не является правильным файлом конфигурации или файл заблокирован");
+            return false;
         }
         System.out.println("OK");
+        return true;
     }
 
     /**
@@ -194,16 +194,18 @@ public class CheckValidationHelper {
     }
 
     /**
-     * Проверка, что файл существует и можно работать дальше
+     * Инициализация файла с проверкой на его существование
      *
-     * @param file - файл
-     * @return true - существует, false - не существует
+     * @param file - файл с конфигурациями
+     * @return true-если файл существует, false - если нет
      */
-    private boolean checkFile(File file) {
+    public boolean setFile(File file) {
         if (!file.exists()) {
             System.out.println("Файл " + file.getAbsolutePath() + " не существует");
             return false;
+        } else {
+            this.file = file;
+            return true;
         }
-        return true;
     }
 }

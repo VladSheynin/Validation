@@ -5,7 +5,10 @@ import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,33 +20,30 @@ import java.util.List;
  */
 public class AdapterExcel {
 
-    private final File file;
-    IndexedColors color;
-    FillPatternType type;
+    private final IndexedColors color;
+    private final FillPatternType type;
+    private File file;
 
 
-    public AdapterExcel(IndexedColors color, FillPatternType type, File file) throws FileNotFoundException {
-        if (checkFile(file)) {
-            this.color = color;
-            this.type = type;
-            this.file = file;
-        } else {
-            throw new FileNotFoundException();
-        }
+    public AdapterExcel(IndexedColors color, FillPatternType type) {
+        this.color = color;
+        this.type = type;
     }
 
     /**
-     * Проверка, что файл существует и можно работать дальше
+     * Инициализация файла с проверкой на его существование
      *
-     * @param file - файл
-     * @return true - существует, false - не существует
+     * @param file - файл с конфигурациями
+     * @return true-если файл существует, false - если нет
      */
-    private boolean checkFile(File file) {
+    public boolean setFile(File file) {
         if (!file.exists()) {
             System.out.println("Файл " + file.getAbsolutePath() + " не существует");
             return false;
+        } else {
+            this.file = file;
+            return true;
         }
-        return true;
     }
 
     /**
@@ -52,12 +52,18 @@ public class AdapterExcel {
      *
      * @return List<List < ObjectForValidation>> - список столбцов из Excel-я разложенный в объекты ObjectForValidation
      */
-    public List<List<ObjectForValidation>> readFromExcel() throws IOException {
+    public List<List<ObjectForValidation>> readFromExcel() {
+        if (file == null) {
+            System.out.println("Файл не проинициализирован - выполните setFile");
+            return null;
+        }
         Sheet sheet;
         try (Workbook workbook = new XSSFWorkbook(file)) {
             sheet = workbook.getSheetAt(0);
         } catch (NotOfficeXmlFileException | IOException | InvalidFormatException e) {
-            throw new NotOfficeXmlFileException("Структура файла " + file.getAbsolutePath() + " не является Excel или файл заблокирован");
+            System.out.println("Структура файла " + file.getAbsolutePath() + " не является Excel или файл заблокирован");
+            return null;
+            //throw new NotOfficeXmlFileException("Структура файла " + file.getAbsolutePath() + " не является Excel или файл заблокирован");
         }
 
         DataFormatter formatter = new DataFormatter();
@@ -88,8 +94,11 @@ public class AdapterExcel {
 
         for (int j = 1; j < rowSize; j++) {
             row = sheet.getRow(j);
-            if (row == null)
-                throw new IOException("Пустая строка номер " + (j + 1) + " в данных");//continue; - такое решение позволит пропускать пустые строки
+            if (row == null) {
+                System.out.println("Пустая строка номер " + (j + 1) + " в данных");
+                return null;
+                //continue; - такое решение позволит пропускать пустые строки
+            }
             for (int k = 0; k < columnCount; k++) {
                 validationObjects.add(new ObjectForValidation(formatter.formatCellValue(row.getCell(k)), j, k));
             }
@@ -108,6 +117,10 @@ public class AdapterExcel {
      * @param errorList - список ошибок из которого формируются Примечания
      */
     public void writeDataToExcel(ErrorList errorList) throws IOException {
+        if (file == null) {
+            System.out.println("Файл не проинициализирован - выполните setFile");
+            return;
+        }
         // Загружаем книгу из файла
         try (FileInputStream fis = new FileInputStream(file); Workbook workbook = new XSSFWorkbook(fis)) {
 

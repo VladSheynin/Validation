@@ -4,7 +4,6 @@ import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.IndexedColors;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,28 +20,25 @@ public class App {
 
     public static void main(String[] args) {
         List<ErrorList> errorLists = new ArrayList<>();
-        AdapterExcel adapterExcel;
-        CheckValidationHelper helper;
-        try {
-            adapterExcel = new AdapterExcel(color, type, new File(excelFileFullPathName));
-            helper = new CheckValidationHelper(new File(configsFileFullPathName));
-        } catch (FileNotFoundException e) {
-            System.out.println("Ошибка в файлах");
+
+        CheckValidationHelper helper = new CheckValidationHelper();
+        if (!helper.setFile(new File(configsFileFullPathName))) {
+            //ошибка, сообщение об ошибке - в методе соответствующего класса
+            return;
+        }
+        helper.getConfigObjectsFromFile();
+
+        AdapterExcel adapterExcel = new AdapterExcel(color, type);
+        if (!adapterExcel.setFile(new File(excelFileFullPathName))) {
+            //ошибка, сообщение об ошибке - в методе соответствующего класса
             return;
         }
 
-        List<List<ObjectForValidation>> allDataFromExcel;
-        try {
-            allDataFromExcel = adapterExcel.readFromExcel();
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return;
-        }
+        // получаем все данные из Excel
+        List<List<ObjectForValidation>> allDataFromExcel = getAllDataFromExcell(adapterExcel);
+        if (allDataFromExcel == null)
+            return; //выход если файл разобрать не удалось. Ошибки логируются в соответствующих методах
 
-        if (allDataFromExcel == null) {
-            System.out.println("Данные не разобраны или файл пустой");
-            return;
-        }
 
         List<ObjectForValidation> columnIterator = new ArrayList<>();
         ErrorList errorList;
@@ -55,8 +51,6 @@ public class App {
 
             errorList = new ErrorList("Столбец " + columnIterator.get(0).getDataForCheck());
             errorLists.add(errorList);    //создаю отдельные очереди для каждого столбца,
-
-            //TODO: распараллелить проверки по отдельным потокам
 
             // получаем объект конфигурации и стартуем с ним проверки
             ConfigObjectForValidation config = helper.getConfigurationObject(columnIterator.get(0).getDataForCheck());
@@ -80,5 +74,14 @@ public class App {
             }
             System.out.println(" ОК");
         }
+    }
+
+    private static List<List<ObjectForValidation>> getAllDataFromExcell(AdapterExcel adapterExcel) {
+        List<List<ObjectForValidation>> allDataFromExcel;
+        allDataFromExcel = adapterExcel.readFromExcel();
+        if (allDataFromExcel == null) {
+            System.out.println("Данные не разобраны.");
+            return null;
+        } else return allDataFromExcel;
     }
 }
